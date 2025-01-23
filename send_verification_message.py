@@ -52,8 +52,13 @@ def send_wa_verify_attendance_msg(to, name:str, event_name:str, details:str , ):
          "to": str(to),
          "type": "template",
          "template": { "name": 'verify_attendance',
-                       "language": { "code": "en_US" },
-                       "components": [{"type": "body",
+                       "language": { "code": "en" },
+                       "components": [{"type": "header",
+                                       "parameters": [{"type": "text",
+                                                       "parameter_name": "event_name",
+                                                       "text": event_name},]
+                                       },
+                                      {"type": "body",
                                        "parameters": [{"type": "text",
                                                        "parameter_name": "name",
                                                        "text": name},
@@ -69,6 +74,24 @@ def send_wa_verify_attendance_msg(to, name:str, event_name:str, details:str , ):
                 }
 
     return requests.post(wa_url, json=wa_data, headers=wa_header) 
+
+
+def send_wa_hello_world(to='6587793855'):
+    wa_data = { "messaging_product": "whatsapp",
+        "to": str(to),
+        "type": "template",
+        "template": { "name": 'hello_world',
+                      "language": { "code": "en_US" }}}
+
+    return requests.post(wa_url, json=wa_data, headers=wa_header) 
+
+
+
+def test_send_wa_hello_world():
+    res = send_wa_hello_world()
+    if res.status_code > 299: # means there's an error
+        print("ERROR SENDING WHATSAPP HELLO WORLD: {}".format(res.content))
+    return res 
 
 
 def send_email(to, name, details):
