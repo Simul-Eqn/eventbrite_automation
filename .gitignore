@@ -1,3 +1,6 @@
 wa_access_token.txt
 wa_phone_number_id.txt
 orders.csv
+ignore
+backup
+__pycache__

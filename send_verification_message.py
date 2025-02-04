@@ -3,23 +3,42 @@
 
 import pandas as pd
 
+orders_df = pd.DataFrame() 
+emails = [] 
+phone_numbers = [] 
+names = [] 
+additional_event_details = '[none]' 
 
-orders_df = pd.read_csv('orders.csv')
 
-emails = orders_df['Email Address'].values.tolist()
-phone_numbers = list(map(str, orders_df['Cell Phone'].values.tolist())) 
-for pnidx in range(len(phone_numbers)): # assumes they're all in Singapore 
-    phone_numbers[pnidx] = '65' + phone_numbers[pnidx] 
-names = orders_df['First Name'].values.tolist()
-#event_names = orders_df['Event Name'].values.tolist() # should be unnecessary 
-num_ticketss = orders_df['Tickets'].values.tolist()
+def load_from_csv(df, phone_col_name='Cell Phone', name_col_name='First Name', email_col_name='Email Address', 
+                  in_additional_event_details="Date: 19 Jan 2025; Location: NUS High School of Mathematics and Science, 20 Clementi Avenue 1, Singapore 129957"): 
+    global orders_df 
+    global emails 
+    global phone_numbers 
+    global names 
+    global additional_event_details 
 
-additional_event_details = """Date: 19 Jan 2025
-Location:
-NUS High School of Mathematics and Science
-20 Clementi Avenue 1
-Singapore 129957
-"""
+    assert '\n' not in in_additional_event_details, 'additional event details cannot have newlines due to whatsapp\'s restrictions :(' 
+
+
+    orders_df = df
+
+    emails = orders_df[email_col_name].values.tolist()
+    phone_numbers = list(map(str, orders_df[phone_col_name].values.tolist())) 
+    for pnidx in range(len(phone_numbers)): # assumes they're all in Singapore 
+        phone_numbers[pnidx] = phone_numbers[pnidx].strip().replace(' ','') 
+        if len(phone_numbers[pnidx]) == 8: 
+            phone_numbers[pnidx] = '65' + phone_numbers[pnidx] 
+        elif len(phone_numbers[pnidx]) == 11 and phone_numbers[pnidx][0]=='+': 
+            phone_numbers[pnidx] = phone_numbers[pnidx][1:] 
+        else: 
+            print("ERROR: COULD NOT PROCESS PHONE NUMBER {}".format(phone_numbers[pnidx]))
+    names = orders_df[name_col_name].values.tolist()
+
+    #event_names = orders_df['Event Name'].values.tolist() # should be unnecessary 
+    #num_ticketss = orders_df['Tickets'].values.tolist()
+
+    additional_event_details = in_additional_event_details
 
 
 
@@ -67,7 +86,7 @@ def send_wa_verify_attendance_msg(to, name:str, event_name:str, details:str , ):
                                                        "text": event_name},
                                                       {"type": "text",
                                                        "parameter_name": "details",
-                                                       "text": "details"}
+                                                       "text": details}
                                                       ]
                                        }],
                        }
@@ -122,10 +141,11 @@ def send_verify_attendance_message(event_name, name, phone_number, email, detail
         return 1, send_email(email, name, details) # (1, ???) for email
     return 0, res # (0, Response) for whatsapp 
 
+'''
 def details_from_num_tickets(num_tickets):
     # if there's any more details we want to add, this is to be modified 
     return "Number of tickets: {}".format(num_tickets)+'\n'+additional_event_details 
-
+'''
 
 
 
@@ -136,14 +156,30 @@ def send_verify_attendance_message_to_all(event_name):
     for i in range(len(names)):
         ress.append(send_verify_attendance_message(event_name, names[i],
                                                    phone_numbers[i], emails[i],
-                                                   details_from_num_tickets(num_ticketss[i])))
+                                                   #details_from_num_tickets(num_ticketss[i])
+                                                   additional_event_details, 
+                                                   ))
     return ress 
 
 
 
 
 if __name__=='__main__':
+    load_from_csv(pd.read_csv('orders.csv')) 
     ress = send_verify_attendance_message_to_all("Test Event") 
+    
+    print() 
+
+    was = [] 
+    emaileds = [] 
+    for i in range(len(names)): 
+        if ress[i][0] == 0: 
+            was.append(phone_numbers[i]) 
+        else: 
+            emaileds.append(emails[i]) 
+    print("WHATSAPPED: {}".format(was))
+    print("EMAILED: {}".format(emaileds)) 
+    print("The above information will be needed when retrieving response, please save it somewhere. ")
 
 
 '''
