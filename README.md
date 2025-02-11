@@ -22,9 +22,9 @@ Below are the setup instructions:
 
    ![](readme_images/eventbrite_export_to_csv.png)
 
-2. Rename the .csv file to "orders.csv" and place it in the same folder as "end_verification_message.py" 
+2. place "wa_access_token.txt" and "wa_phone_number_id.txt" in the same folder as "end_verificaion_message.py". These are files containing sensitive information about the whatsapp account used to send messages. 
 
-3. place "wa_access_token.txt" and "wa_phone_number_id.txt" in the same folder as "end_verificaion_message.py". These are files containing sensitive information about the whatsapp account used to send messages. 
+3. In the web app (streamlit run csv_streamlit_app.py), upload your order data csv file, fill in the required fields and press send. 
 
 4. some more setup is needed for emailing, but it's not implemented yet, so further instructions will be added later 
 
