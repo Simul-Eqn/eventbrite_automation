@@ -7,7 +7,7 @@ import io
 
 st.title("csv app")
 
-csv_file = st.file_uploader("Upload your CSV file here") 
+csv_file = st.file_uploader("Upload your CSV file here", type='csv') 
 if csv_file is not None: 
     df = pd.read_csv(csv_file) 
     st.write("Preview of Uploaded Data:")
@@ -40,7 +40,8 @@ if csv_file is not None:
     
 
     if st.button("Download cleaned CSV for mailchimp"): 
-        #a = 
-        st.write("not implemented yet")
-
+        a = df[[email_col, name_col]].copy() 
+        a.columns = ['Email Address', 'First Name'] 
+        acsv = a.to_csv(index=False) 
+        st.download_button("Download CSV", acsv, file_name='email_list.csv', mime="text/csv")
 
