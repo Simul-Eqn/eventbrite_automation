@@ -1,5 +1,6 @@
 wa_access_token.txt
 wa_phone_number_id.txt
+set_secrets.py
 orders.csv
 ignore
 backup

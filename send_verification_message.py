@@ -45,10 +45,17 @@ def load_from_csv(df, phone_col_name='Cell Phone', name_col_name='First Name', e
 
 # setup whatsapp api
 
+'''
 with open("wa_access_token.txt", 'r') as f:
     wa_access_token = f.readline().strip()
 with open("wa_phone_number_id.txt", 'r') as f:
     phone_number_id = f.readline().strip() 
+'''
+
+import os 
+wa_access_token = os.environ['wa_access_token'] 
+phone_number_id = os.environ['wa_phone_number_id'] 
+
 
 
 import requests
